@@ -10,49 +10,62 @@ new_window.geometry("125x420+0+80")
 new_window.attributes("-topmost", True)
 new_window.attributes("-toolwindow", 1)
 
-buttons = {}
-button_count = 0
+widgets = {}  # Use a single dictionary to store widgets of different types
+widget_count = {}  # Use a dictionary to store counts for different widget types
 
-def on_button_press(event, button):
-    button.is_dragging = True
-    button.start_x = event.x_root - button.winfo_x()
-    button.start_y = event.y_root - button.winfo_y()
+_count = 0
 
-def on_button_drag(event, button):
-    if button.is_dragging:
-        new_x = event.x_root - button.start_x
-        new_y = event.y_root - button.start_y
-        button.place(x=new_x, y=new_y)
+def on_button_press(event, widget):
+    widget.is_dragging = True
+    widget.start_x = event.x_root - widget.winfo_x()
+    widget.start_y = event.y_root - widget.winfo_y()
 
-def on_button_release(event, button):
-    button.is_dragging = False
-    update_button_position(button)
+def on_button_drag(event, widget):
+    if widget.is_dragging:
+        new_x = event.x_root - widget.start_x
+        new_y = event.y_root - widget.start_y
+        widget.place(x=new_x, y=new_y)
+
+def on_button_release(event, widget, widget_dict):
+    widget.is_dragging = False
+    update_widget_position(widget, widget_dict)
+
+def instantiate_widget(widgetType, count_key, dict_widget):
+    global _count
+
+    _count += 1
+
+    widgetType.place(x=root.winfo_width() // 2, y=root.winfo_height() // 2, anchor="center")
+
+    widgetType.is_dragging = False
+    widgetType.start_x = 0
+    widgetType.start_y = 0
+
+    widgetType.bind("<ButtonPress-1>", lambda event, widget=widgetType: on_button_press(event, widget))
+    widgetType.bind("<B1-Motion>", lambda event, widget=widgetType: on_button_drag(event, widget))
+    widgetType.bind("<ButtonRelease-1>", lambda event, widget=widgetType: on_button_release(event, widget, dict_widget))
+
+    widget_count[count_key] = _count
+    dict_widget[_count] = widgetType
+
+def update_widget_position(widgetType, widget_dict):
+    position = (widgetType.winfo_x(), widgetType.winfo_y())
+    widget_type_name = type(widgetType).__name__
+    widget_id = list(widget_dict.keys())[list(widget_dict.values()).index(widgetType)]
+    print(f"{widget_type_name} ID {widget_id}: {position}")
 
 def instantiate_button():
-    global button_count
-    button_count += 1
-
     new_button = tk.Button(root, text="Dynamic Button")
-    new_button.place(x=root.winfo_width() // 2, y=root.winfo_height() // 2, anchor="center")
-    new_button.winfo_y
-    new_button.is_dragging = False
-    new_button.start_x = 0
-    new_button.start_y = 0
+    instantiate_widget(new_button, 'button', widgets)
 
-    new_button.bind("<ButtonPress-1>", lambda event, button=new_button: on_button_press(event, button))
-    new_button.bind("<B1-Motion>", lambda event, button=new_button: on_button_drag(event, button))
-    new_button.bind("<ButtonRelease-1>", lambda event, button=new_button: on_button_release(event, button))
-
-    buttons[button_count] = new_button
-
-def update_button_position(button):
-    position = (button.winfo_x(), button.winfo_y())
-    print(f"Button ID {button_count}: {position}")
+def instantiate_label():
+    new_label = tk.Label(root, text="Dynamic Label")
+    instantiate_widget(new_label, 'label', widgets)
 
 button_create = tk.Button(new_window, text="New Button", command=instantiate_button)
 button_create.place(x=15, y=10)
 
-label_create = tk.Button(new_window, text="New Label", command=instantiate_button)
+label_create = tk.Button(new_window, text="New Label", command=instantiate_label)
 label_create.place(x=15, y=40)
 
 
