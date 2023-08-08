@@ -1,35 +1,26 @@
 import tkinter as tk
 
+def resize_button(event):
+    new_width = button.winfo_width() + event.x - start_x
+    new_height = button.winfo_height() + event.y - start_y
+    button.config(width=new_width, height=new_height)
+
+    # Update the starting position
+    start_x = event.x
+    start_y = event.y
+
+def start_resize(event):
+    global start_x, start_y
+    start_x = event.x
+    start_y = event.y
+
 root = tk.Tk()
+root.title("Resize Button Example")
 
-button = tk.Button(root, text="Button")
-button.place(x=90, y=80, anchor="center")
+button = tk.Button(root, text="Resize Me", width=10, height=3)
+button.pack()
 
-
-text_create = tk.Entry(root, width=300)
-text_create.place(x=100, y=120)
-
-# def on_select(event, widget):
-#     global start_x, start_y
-#     start_x = event.x
-#     start_y = event.y
-
-# def on_drag(event, widget):
-#     global start_x, start_y
-#     delta_x = event.x - start_x
-#     delta_y = event.y - start_y
-#     new_width = widget.winfo_width() + delta_x
-#     new_height = widget.winfo_height() + delta_y
-#     widget.configure(width=new_width, height=new_height)
-#     start_x = event.x
-#     start_y = event.y
-
-# def on_release(event, widget):
-#     widget.unbind("<B1-Motion>")
-#     widget.unbind("<ButtonRelease-1>")
-
-# button.bind("<ButtonPress-1>", lambda event: on_select(event, button))
-# button.bind("<B1-Motion>", lambda event: on_drag(event, button))
-# button.bind("<ButtonRelease-1>", lambda event: on_release(event, button))
+button.bind("<Button-1>", start_resize)
+button.bind("<B1-Motion>", resize_button)
 
 root.mainloop()
