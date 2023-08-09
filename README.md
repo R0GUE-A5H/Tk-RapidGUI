@@ -50,6 +50,11 @@ To generate Python code based on the positioned widgets, click on the "Generate 
 
 Customize the generated code to integrate the GUI layout into your application.
 ```
+![image](https://github.com/R0GUE-A5H/Tk-RapidGUI/assets/38578557/9a7b6dc5-6d69-4e52-8c78-5a358e35c86b)
+![image](https://github.com/R0GUE-A5H/Tk-RapidGUI/assets/38578557/df7d08a2-4740-43f5-812a-296504b9ad40)
+![image](https://github.com/R0GUE-A5H/Tk-RapidGUI/assets/38578557/cc559d35-8e5d-4e41-87e6-78cec99eb648)
+![image](https://github.com/R0GUE-A5H/Tk-RapidGUI/assets/38578557/ecebca99-6dba-482d-8bef-0213d2d3d372)
+
 
 ## **Example Generated Code**
 The tool generates Python code that corresponds to the positioned widgets. Here is an example of the generated code:
