@@ -7,11 +7,11 @@ root = tk.Tk()
 root.title("Tkinter Rapid Development")
 root.geometry("640x320")
 
-# new_window = tk.Toplevel(root)
-# new_window.title("Property")
-# new_window.geometry(f"320x300")#125x420+0+80
-# new_window.attributes("-topmost", True)
-# new_window.attributes("-toolwindow", 1)
+# property_win = tk.Toplevel(root)
+# property_win.title("Property")
+# property_win.geometry(f"320x300")#125x420+0+80
+# property_win.attributes("-topmost", True)
+#= property_win.attributes("-toolwindow", 1)
 
 # Create a dictionary to store widget information
 widget_info = {}
@@ -100,16 +100,39 @@ def save_widget_info_to_file():
 
 def generate_file():
     file_code = f'''
-    import tkinter as tk
-    from tkinter.ttk import ProgressBar
+import tkinter as tk
+from tkinter.ttk import Progressbar
 
-    root = tk.Tk()
-    root.title("Your Application")
-    root.geometry("640x320")
-
-    
-
+root = tk.Tk()
+root.title("Your Application")
+root.geometry("640x320")
     '''
+    for widget_type, widget_pos in widget_info.items():
+        widget_name = widget_type.split()[0]
+        widget_id = widget_type.split()[1]
+        widget_name = widget_type[:widget_type.index(' ')]  # Directly assign the desired substring
+
+        x, y = widget_pos
+
+        x = root.winfo_width() // 2 if x ==0 else x
+        y = root.winfo_height() // 2 if y ==0 else y 
+
+        if widget_name == "Button":
+            file_code += f'''
+Button{widget_id} = tk.Button(root, text="{widget_name+widget_id}")
+Button{widget_id}.place(x={x}, y={y})
+            '''
+        elif widget_name == "Label":
+            file_code += f'''
+Label{widget_id} = tk.Label(root, text="{widget_name+widget_id}")
+Label{widget_id}.place(x={x}, y={y})
+'''
+        
+    file_code += "root.mainloop()"
+
+    with open("GeneratedPyFile.py", "w") as code_file:
+        code_file.write(file_code)
+
 
 # name_Label = tk.Label(new_window)
 # name_Label.place(x=0, y=10)
