@@ -33,6 +33,8 @@ def on_button_drag(event, widget):
         new_x = event.x_root - widget.start_x
         new_y = event.y_root - widget.start_y
         widget.place(x=new_x, y=new_y)
+        update_status(new_x, new_y)
+
 
 def on_button_release(event, widget):
     widget.is_dragging = False
@@ -98,7 +100,9 @@ def save_widget_info_to_file():
     with open("widget_info.json", "w") as json_file:
         json.dump(widget_info, json_file)
 
+count = 0
 def generate_file():
+    global count
     file_code = f'''
 import tkinter as tk
 from tkinter.ttk import Progressbar
@@ -118,17 +122,55 @@ root.geometry("640x320")
         y = root.winfo_height() // 2 if y ==0 else y 
 
         if widget_name == "Button":
+            count += 1
+            if(count):
+                file_code += f'''
+def func{widget_name+widget_id}():
+    pass
+'''       
             file_code += f'''
-Button{widget_id} = tk.Button(root, text="{widget_name+widget_id}")
+Button{widget_id} = tk.Button(root, text="{widget_name+widget_id}", command="func{widget_name+widget_id}")
 Button{widget_id}.place(x={x}, y={y})
-            '''
+'''
+            
         elif widget_name == "Label":
+            count += 1
+            if(count):
+                file_code += f'''
+def func{widget_name+widget_id}():
+    pass
+'''
             file_code += f'''
 Label{widget_id} = tk.Label(root, text="{widget_name+widget_id}")
 Label{widget_id}.place(x={x}, y={y})
 '''
+        elif widget_name == "Entry":
+            count += 1
+            if(count):
+                file_code += f'''
+def func{widget_name+widget_id}():
+    pass
+'''
+            file_code += f'''
+Entry{widget_id} = tk.Entry(root)
+Entry{widget_id}.place(x={x}, y={y})
+'''
         
-    file_code += "root.mainloop()"
+        elif widget_name == "Progressbar":
+            count += 1
+            if(count):
+                file_code += f'''
+def func{widget_name+widget_id}():
+    pass
+'''
+            file_code += f'''
+Progressbar{widget_id} = Progressbar(root)
+Progressbar{widget_id}.place(x={x}, y={y})
+'''
+            
+    file_code += f'''
+root.mainloop()
+'''
 
     with open("GeneratedPyFile.py", "w") as code_file:
         code_file.write(file_code)
@@ -154,6 +196,14 @@ menu.add_separator()
 menu.add_command(label="Scale")
 menu.add_command(label="Scrollbar")
 menu.add_command(label="Frame", command=instantiate_frame)
+
+
+status_bar = tk.Label(root, text =f"{widget_info}", relief="sunken")
+
+status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
+def update_status(x, y):
+    status_bar.config(text=f"{widget_type_name, widget_id}: x={x}, y={y}")
 
 root.bind("<Button-3>", lambda event: menu.tk_popup(event.x_root, event.y_root))
 
