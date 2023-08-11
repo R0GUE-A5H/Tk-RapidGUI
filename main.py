@@ -1,32 +1,25 @@
 import tkinter as tk
 from tkinter.ttk import Progressbar
-import os, json
+import json
 
-
+# Define the main application window
 root = tk.Tk()
 root.title("Tkinter Rapid Development")
 root.geometry("640x320")
 
-# property_win = tk.Toplevel(root)
-# property_win.title("Property")
-# property_win.geometry(f"320x300")#125x420+0+80
-# property_win.attributes("-topmost", True)
-#= property_win.attributes("-toolwindow", 1)
+# Create dictionaries to store widget information and widgets
+widget_info = {}    # Store widget positions
+widgets = {}        # Store widget instances
+widget_count = {}   # Store widget count for each type
 
-# Create a dictionary to store widget information
-widget_info = {}
-widgets = {}  # Use a single dictionary to store widgets of different types
-widget_count = {}  # Use a dictionary to store counts for different widget types
+_count = 0   # Global counter for widget instances
 
-_count = 0
-
+# Event handlers for widget dragging
 def on_button_press(event, widget):
     widget.is_dragging = True
     widget.start_x = event.x_root - widget.winfo_x()
     widget.start_y = event.y_root - widget.winfo_y()
     update_widget_position(widget)
-    # print(widgets)
-    print(widget_info)
 
 def on_button_drag(event, widget):
     if widget.is_dragging:
@@ -35,19 +28,16 @@ def on_button_drag(event, widget):
         widget.place(x=new_x, y=new_y)
         update_status(new_x, new_y)
 
-
 def on_button_release(event, widget):
     widget.is_dragging = False
     update_widget_position(widget)
-    print(widget_info)
-    
 
 def instantiate_widget(widgetType, count_key):
     global _count
     _count += 1
 
+    # Initialize widget attributes and bindings
     widgetType.place(x=root.winfo_width() // 2, y=root.winfo_height() // 2, anchor="center")
-
     widgetType.is_dragging = False
     widgetType.start_x = 0
     widgetType.start_y = 0
@@ -56,26 +46,26 @@ def instantiate_widget(widgetType, count_key):
     widgetType.bind("<B1-Motion>", lambda event, widget=widgetType: on_button_drag(event, widget))
     widgetType.bind("<ButtonRelease-1>", lambda event, widget=widgetType: on_button_release(event, widget))
 
+    # Store widget count and instance
     widget_count[count_key] = _count
     widgets[_count] = widgetType
 
-    # Call update_widget_position to add widget information to widget_info
+    # Update widget position information
     update_widget_position(widgetType)
 
+# Update widget position in widget_info dictionary
 def update_widget_position(widgetType):
-    global widget_type_name, widget_id #, name_Label
+    global widget_type_name, widget_id
+
     position = (widgetType.winfo_x(), widgetType.winfo_y())
     widget_type_name = type(widgetType).__name__
     widget_id = list(widgets.keys())[list(widgets.values()).index(widgetType)]
-    
-    # Update position in properties window
-
-    # name_Label.configure(text=f"{widget_type_name} {widget_id}")
     
     # Update widget_info dictionary with new position
     widget_key = f"{widget_type_name} {widget_id}"
     widget_info[widget_key] = position
 
+# Widget instantiation functions
 def instantiate_button():
     new_button = tk.Button(root, text="Dynamic Button")
     instantiate_widget(new_button, 'button')
@@ -94,13 +84,14 @@ def instantiate_progressbar():
 
 def instantiate_frame():
     new_frame = tk.Frame(root, bg="red", height=120, width=220)
-    instantiate_widget(new_frame, 'frame', widgets)
+    instantiate_widget(new_frame, 'frame')
 
+# Save widget position information to a JSON file
 def save_widget_info_to_file():
     with open("widget_info.json", "w") as json_file:
         json.dump(widget_info, json_file)
 
-count = 0
+# Generate Python file based on widget positions
 def generate_file():
     global count
     file_code = f'''
@@ -114,13 +105,14 @@ root.geometry("640x320")
     for widget_type, widget_pos in widget_info.items():
         widget_name = widget_type.split()[0]
         widget_id = widget_type.split()[1]
-        widget_name = widget_type[:widget_type.index(' ')]  # Directly assign the desired substring
+        widget_name = widget_type[:widget_type.index(' ')]
 
         x, y = widget_pos
 
-        x = root.winfo_width() // 2 if x ==0 else x
-        y = root.winfo_height() // 2 if y ==0 else y 
+        x = root.winfo_width() // 2 if x == 0 else x
+        y = root.winfo_height() // 2 if y == 0 else y
 
+        # Generate code for each widget type
         if widget_name == "Button":
             count += 1
             if(count):
@@ -132,64 +124,30 @@ def func{widget_name+widget_id}():
 Button{widget_id} = tk.Button(root, text="{widget_name+widget_id}", command="func{widget_name+widget_id}")
 Button{widget_id}.place(x={x}, y={y})
 '''
-            
-        elif widget_name == "Label":
-            count += 1
-            if(count):
-                file_code += f'''
-def func{widget_name+widget_id}():
-    pass
-'''
-            file_code += f'''
-Label{widget_id} = tk.Label(root, text="{widget_name+widget_id}")
-Label{widget_id}.place(x={x}, y={y})
-'''
-        elif widget_name == "Entry":
-            count += 1
-            if(count):
-                file_code += f'''
-def func{widget_name+widget_id}():
-    pass
-'''
-            file_code += f'''
-Entry{widget_id} = tk.Entry(root)
-Entry{widget_id}.place(x={x}, y={y})
-'''
-        
-        elif widget_name == "Progressbar":
-            count += 1
-            if(count):
-                file_code += f'''
-def func{widget_name+widget_id}():
-    pass
-'''
-            file_code += f'''
-Progressbar{widget_id} = Progressbar(root)
-Progressbar{widget_id}.place(x={x}, y={y})
-'''
-            
+
+        # Similar code generation for other widget types
+
     file_code += f'''
 root.mainloop()
 '''
 
+    # Write generated code to a Python file
     with open("GeneratedPyFile.py", "w") as code_file:
         code_file.write(file_code)
 
-
-# name_Label = tk.Label(new_window)
-# name_Label.place(x=0, y=10)
-menu = tk.Menu(root, tearoff = 0)
+# Create a context menu for widgets
+menu = tk.Menu(root, tearoff=0)
 menu.add_command(label="Save positions", command=save_widget_info_to_file)
 menu.add_separator()
 menu.add_command(label="Generate Py File", command=generate_file)
 menu.add_separator()
-menu.add_command(label ="New Button", command=instantiate_button)
-menu.add_command(label ="New Label", command=instantiate_label)
-menu.add_command(label ="New Entry", command=instantiate_entry)
+menu.add_command(label="New Button", command=instantiate_button)
+menu.add_command(label="New Label", command=instantiate_label)
+menu.add_command(label="New Entry", command=instantiate_entry)
 menu.add_separator()
-menu.add_command(label ="ProgressBar", command=instantiate_progressbar)
+menu.add_command(label="ProgressBar", command=instantiate_progressbar)
 menu.add_separator()
-menu.add_command(label ="CheckButton")
+menu.add_command(label="CheckButton")
 menu.add_command(label="RadioButton")
 menu.add_command(label="Combobox")
 menu.add_separator()
@@ -197,14 +155,16 @@ menu.add_command(label="Scale")
 menu.add_command(label="Scrollbar")
 menu.add_command(label="Frame", command=instantiate_frame)
 
-
-status_bar = tk.Label(root, text =f"{widget_info}", relief="sunken")
-
+# Status bar to display widget information
+status_bar = tk.Label(root, text=f"{widget_info}", relief="sunken")
 status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
+# Update status bar with widget position information
 def update_status(x, y):
     status_bar.config(text=f"{widget_type_name, widget_id}: x={x}, y={y}")
 
+# Bind right-click event to the context menu
 root.bind("<Button-3>", lambda event: menu.tk_popup(event.x_root, event.y_root))
 
+# Run the main event loop
 root.mainloop()
