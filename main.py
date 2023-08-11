@@ -1,3 +1,58 @@
+""" Tk-RapidGUI
+
+Prerequisites (Python 3.x):
+tkinter, ttk, json
+
+
+MIT License
+
+Copyright (c) 2023 Ashwin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. """
+
+
+# Future Additions
+# ----------------
+
+# TODO: Implement a Property Window that allows users to customize various aspects of widgets,
+#       such as size, color, background, foreground, text, and position. Similar to the features
+#       found in tools like Unity for game development.
+
+# TODO: Refactor the codebase for better organization and readability.
+#       Add comments to explain the purpose of different sections and functions.
+
+# TODO: Implement a mechanism to adjust widget positions dynamically as the root window is resized.
+#       This ensures that widgets maintain their positions relative to the window size.
+
+# TODO: Provide an option for users to choose where to save the GeneratedPyFile.
+#       Additionally, offer the ability to save widget positions in a JSON format for easy configuration.
+
+# TODO: Expand widget support to include more advanced components like PhotoImage, ScrollBar, ListBox, etc.
+#       This will enhance the versatility of the GUI application.
+
+# TODO: Allow the root window geometry to be set according to the user's resizing by mouse.
+#       This ensures that the window size and position can be customized to user preferences.
+
+# End of Future Additions
+# -----------------------
+
+
 import tkinter as tk
 from tkinter.ttk import Progressbar
 import json
