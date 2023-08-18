@@ -60,7 +60,7 @@ import json
 
 class TK_Entry(tk.Entry):
 
-    def __init__(self, master=None, callback=None, **kwargs):
+    def __init__(self, master=None, callback=None, default_text="",**kwargs):
         super().__init__(master=master, **kwargs) # same as below one
         # tk.Entry.__init__(self, master=master, **kwargs)
 
@@ -69,9 +69,11 @@ class TK_Entry(tk.Entry):
         self.var = tk.StringVar()
 
         self.config(textvariable=self.var)
+        self.var.set(default_text)
 
         if self.callback:
             self.var.trace('w', self.on_val_change)
+            
     
     def on_val_change(self, *args):
         if self.callback:
@@ -94,7 +96,15 @@ pop_window = tk.Toplevel(root)
 pop_window.geometry(f"300x320+770+0")
 pop_window.title("Property")
 pop_window.attributes("-toolwindow", True)
-pop_window.attributes("-topmost", True)
+pop_window.iconify()
+# pop_window.attributes("-topmost", True)
+
+def toggle_popup_window():
+    if pop_window.state() == 'normal':
+        pop_window.iconify()  # Minimize the window if it's currently open
+    else:
+        pop_window.deiconify()  # Restore and bring the window to the front if it's minimized or hidden
+
 property_frame = tk.LabelFrame(pop_window, text="Property").pack(padx=2,pady=2,fill="both", expand=True)
 
 
@@ -118,11 +128,14 @@ def create_properties(widget):
         widgets.destroy()
     
     def resize(val): #Accepts INT
-            try:
-                widget.config(font=('Arial', int(val)))
-            except:
-                if int(val) <0  or int(val) ==0 or int(val) < 5:
-                    messagebox.showinfo("Enter valid int value")
+        widget.config(font=('Arial', int(val)))
+            # try:
+            #     widget.config(font=('Arial', int(val)))
+            #     if int(val) <0  or int(val) ==0 or int(val) < 5:
+            #         messagebox.showerror("Invalid Int", "Value must be greater 5")
+            # except ValueError:
+            #     pass
+                
     def change_text(texts):
         widget.config(text=texts)
     
@@ -143,6 +156,7 @@ def create_properties(widget):
         button_label = tk.Label(pop_window, text="Button Text", font=('Arial', 10))
         button_label.place(x=0, y=50)
         button_text_entry = TK_Entry(pop_window, callback=change_text)
+        
         button_text_entry.place(x=80,y=51)
 
         relief_style_lst = ["sunken", "raised", "flat", "groove", "solid", "ridge"]
@@ -246,7 +260,7 @@ def instantiate_widget(widgetType, count_key):
     _count += 1
 
     # Initialize widget attributes and bindings
-    widgetType.place(x=root.winfo_width() // 2, y=root.winfo_height() // 2, anchor="center")
+    widgetType.place(x=root.winfo_width() // 2, y=root.winfo_height() // 2, anchor="center", bordermode='inside')
     widgetType.is_dragging = False
     widgetType.start_x = 0
     widgetType.start_y = 0
@@ -303,15 +317,15 @@ def instantiate_combobox():
 
 def instantiate_radiobutton():
     new_frame = tk.Frame(root, bg="red", height=120, width=220)
-    instantiate_widget(new_frame, 'frame')
+    instantiate_widget(new_frame, 'radiobutton')
 
 def instantiate_checkbutton():
     new_frame = tk.Frame(root, bg="red", height=120, width=220)
-    instantiate_widget(new_frame, 'frame')
+    instantiate_widget(new_frame, 'checkbutton')
 
 def instantiate_separator():
     new_frame = tk.Frame(root, bg="red", height=120, width=220)
-    instantiate_widget(new_frame, 'frame')
+    instantiate_widget(new_frame, 'separator')
 
 def instantiate_():
     new_frame = tk.Frame(root, bg="red", height=120, width=220)
@@ -423,7 +437,23 @@ status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 # Update status bar with widget position information
 def update_status(x, y):
     status_bar.config(text=f"{widget_type_name, widget_id}: x={x}, y={y}")
+def get_window_resize(event):
+    print("New width:", event.width)
+    print("New Height:", event.height)
 
+    # for i in root.winfo_children():
+    #     if isinstance(i, tk.Toplevel):
+    #         continue
+    #     new_x = event.width - i.winfo_reqwidth()
+    #     new_y = event.height - i.winfo_reqheight()
+    #     i.place(x=new_x, y=new_y)
+
+
+show_btn = tk.Button(root, text="<", font='Arial 10 bold', command=toggle_popup_window)
+show_btn.place(relx=1.0, rely=0.5, anchor='e', bordermode='inside')
+
+root.bind("<Configure>", get_window_resize)
+   
 # Bind right-click event to the context menu
 root.bind("<Button-3>", lambda event: menu.tk_popup(event.x_root, event.y_root))
 # Run the main event loop
